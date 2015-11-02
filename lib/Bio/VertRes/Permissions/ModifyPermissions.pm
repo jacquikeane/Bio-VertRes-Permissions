@@ -1,4 +1,5 @@
 package Bio::VertRes::Permissions::ModifyPermissions;
+
 # ABSTRACT:  Take in a list of directories and update the permissions and owners of all files
 
 =head1 SYNOPSIS
@@ -15,51 +16,59 @@ Take in a list of directories and update the permissions and owners of all files
 use Moose;
 use Parallel::ForkManager;
 use File::Find;
+with 'Bio::VertRes::Permissions::LoggerRole';
 
 has 'input_directories' => (
-    is  => 'ro',
-    isa => 'ArrayRef',
-    required => 1 );
+    is       => 'ro',
+    isa      => 'ArrayRef',
+    required => 1
+);
 has 'threads'           => ( is => 'ro', isa => 'Int', default  => 1 );
-has 'verbose'           => ( is => 'ro', isa => 'Bool', default  => 0 );
-has 'group'             => ( is => 'ro', isa => 'Str', required  => 0 );
-has 'user'              => ( is => 'ro', isa => 'Str', required  => 0 );
+has 'group'             => ( is => 'ro', isa => 'Str', required => 0 );
+has 'user'              => ( is => 'ro', isa => 'Str', required => 0 );
 has 'octal_permissions' => ( is => 'ro', isa => 'Str', default  => '0750' );
 
-sub _wanted {
-  my $self = ${$_[0]}{self};
-  return unless(defined $File::Find::name);
-  
-  if($self->verbose)
-  {
-	  print $File::Find::name."\n";
-  }
+sub BUILD {
+    my ($self) = @_;
+    $self->logger->info( "Changing file permissions - threads: " . $self->threads );
+    $self->logger->info( "Changing file permissions - permissions: " . $self->octal_permissions );
+    $self->logger->info( "Changing file permissions - user: " . $self->user );
+    $self->logger->info( "Changing file permissions - group: " . $self->group );
+}
 
-  my $uid = getpwnam $self->user;
-  my $gid = getgrnam $self->group; 
-  
-  chmod oct($self->octal_permissions), $File::Find::name;
-  chown $uid, $gid, $_;
+sub _wanted {
+    my $self = ${ $_[0] }{self};
+    return unless ( defined $File::Find::name );
+
+    $self->logger->info( "Update File: " . $File::Find::name );
+    my $uid = getpwnam $self->user;
+    my $gid = getgrnam $self->group;
+
+    chmod oct( $self->octal_permissions ), $File::Find::name;
+    chown $uid, $gid, $_;
 }
 
 sub update_permissions {
     my ($self) = @_;
-	
-	my $pm = new Parallel::ForkManager($self->threads); 
-	for my $directory (@{$self->input_directories})
-	{
-		$pm->start and next;
-		
-		find({ wanted => sub {
-        _wanted({self => $self});
-      }
-	  , follow => 1 }, $directory);
-		$pm->finish;
-	}
-	$pm->wait_all_children;
-	return $self;
-}
 
+    my $pm = new Parallel::ForkManager( $self->threads );
+    for my $directory ( @{ $self->input_directories } ) {
+        $pm->start and next;
+
+        find(
+            {
+                wanted => sub {
+                    _wanted( { self => $self } );
+                },
+                follow => 1
+            },
+            $directory
+        );
+        $pm->finish;
+    }
+    $pm->wait_all_children;
+    return $self;
+}
 
 no Moose;
 __PACKAGE__->meta->make_immutable;
