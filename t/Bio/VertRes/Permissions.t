@@ -9,7 +9,7 @@ BEGIN { unshift( @INC, './lib' ) }
 
 BEGIN {
     use Test::Most;
-    use_ok('Bio::VertRes::Permissions::ModifyPermissions');
+    use_ok('Bio::VertRes::Permissions');
     use Bio::VertRes::Permissions::Groups;
 }
 my $obj;
@@ -37,15 +37,9 @@ for ( my $i = 0 ; $i < $num_temp_directories ; $i++ ) {
 my $octal_permissions = '0700';
 for my $group ( @{$groups} ) {
 	next if $group =~ /^[\d]+$/;
-    ok(
-        $obj = Bio::VertRes::Permissions::ModifyPermissions->new(
-            input_directories => \@temp_dirs,
-            user              => $username,
-            group             => $group,
-            octal_permissions => $octal_permissions
-        ), "Create object for group $group"
-    );
-    ok( $obj->update_permissions, "Update permissions to group $group" );
+
+    ok($obj = Bio::VertRes::Permissions->new(input_directories => \@temp_dirs, partition_level => 2, threads => 1, group => $group, user => $username, octal_permissions => $octal_permissions), "initialise permissions obj for group $group");
+    ok($obj->update_permissions(), "update permissions for group $group");
 
 	for my $temp_file (@temp_files)
 	{
