@@ -24,8 +24,8 @@ has 'input_directories' => (
     required => 1
 );
 has 'threads'           => ( is => 'ro', isa => 'Int', default  => 1 );
-has 'group'             => ( is => 'ro', isa => 'Str', required => 0 );
-has 'user'              => ( is => 'ro', isa => 'Str', required => 0 );
+has 'group'             => ( is => 'ro', isa => 'Str', required => 1 );
+has 'user'              => ( is => 'ro', isa => 'Str', lazy => 1, builder => '_build_user' );
 has 'octal_permissions' => ( is => 'ro', isa => 'Str', default  => '0750' );
 
 sub BUILD {
@@ -34,6 +34,12 @@ sub BUILD {
     $self->logger->info( "Changing file permissions - permissions: " . $self->octal_permissions );
     $self->logger->info( "Changing file permissions - user: " . $self->user );
     $self->logger->info( "Changing file permissions - group: " . $self->group );
+}
+
+sub _build_user
+{
+	my ($self) = @_;
+	return $ENV{LOGNAME} || $ENV{USER} || getpwuid($<);
 }
 
 sub _wanted {
