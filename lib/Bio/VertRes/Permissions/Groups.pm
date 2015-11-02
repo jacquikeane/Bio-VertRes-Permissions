@@ -30,14 +30,19 @@ sub _build_groups {
 
 sub is_member_of_group {
     my ( $self, $input_group ) = @_;
-    if ( grep { $_ eq $input_group } @{ $self->groups } ) {
-		$self->logger->info("The current users groups include $input_group");
-        return 1;
+	
+	# The input group can be a space separated list of group names, so check all and return when 1 is found.
+	my @input_groups = split(/[\s\t]+/,$input_group);
+	
+	for my $current_group (@input_groups)
+	{
+        if ( grep { $_ eq $current_group } @{ $self->groups } ) {
+	    	$self->logger->info("The current users groups include $input_group");
+            return $current_group;
+        }
     }
-    else {
-		$self->logger->info("The current users groups do not include $input_group");
-        return 0;
-    }
+	$self->logger->info("The current users groups do not include $input_group");
+    return 0;
 }
 
 no Moose;

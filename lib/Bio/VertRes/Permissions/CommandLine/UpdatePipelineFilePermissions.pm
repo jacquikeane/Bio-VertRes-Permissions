@@ -21,7 +21,7 @@ has 'args'                               => ( is => 'ro', isa => 'ArrayRef', req
 has 'script_name'                        => ( is => 'ro', isa => 'Str',      required => 1 );
 has 'help'                               => ( is => 'rw', isa => 'Bool',     default  => 0 );
 has 'type'                               => ( is => 'rw', isa => 'Str',      default  => 'file_of_directories' );
-has 'type_id'                            => ( is => 'rw', isa => 'Str',      default  => 'input_file' );
+has 'type_id'                            => ( is => 'rw', isa => 'Str',      default  => '' );
 has 'user'                               => ( is => 'rw', isa => 'Str',      default  => 'pathpipe' );
 has 'group'                              => ( is => 'rw', isa => 'Str',      default  => 'pathogen' );
 has 'octal_permissions'                  => ( is => 'rw', isa => 'Str',      default  => '0750' );
@@ -57,6 +57,7 @@ sub BUILD {
 
     $self->help($help) if ( defined($help) );
     ( !$self->help ) or die $self->usage_text;
+	( defined( $type_id) && -e  $type_id ) or die $self->usage_text;
 
     $self->type($type)                                                             if ( defined($type) );
     $self->type_id($type_id)                                                       if ( defined($type_id) );
@@ -81,7 +82,7 @@ sub run {
     my $input_directories =
       Bio::VertRes::Permissions::ParseFileOfDirectories->new( input_file => $self->type_id, logger => $self->logger )->directories();
 
-    $update_permissions_obj = Bio::VertRes::Permissions->new(
+    my $update_permissions_obj = Bio::VertRes::Permissions->new(
         input_directories                  => $input_directories,
         partition_level                    => $self->partition_level,
         threads_per_disk_array             => $self->threads_per_disk_array,
@@ -103,12 +104,12 @@ Changes the permissions of all files in a set of directories
   
 Options: -t STR    type [file_of_directories]
          -i STR    input filename of directories []
-		 -u STR    username [pathpipe]
-		 -g STR    unix group [pathogen]
-		 -o STR    file permissions in octal [0750]
-		 -l INT    directory level to split on [2]
-		 -t INT    threads per disk array [1]
-		 -p INT    num disk arrays to process in parallel [1]
+         -u STR    username [pathpipe]
+         -g STR    unix group [pathogen]
+         -o STR    file permissions in octal [0750]
+         -l INT    directory level to split on [2]
+         -t INT    threads per disk array [1]
+         -p INT    num disk arrays to process in parallel [1]
          -v        verbose output to STDOUT
          -h        this help message
 		 
@@ -116,7 +117,7 @@ Example: Run with defaults
          update_pipeline_file_permissions -i file_of_directories.txt 
 
 Example: Update group to team81 in parallel
-		 bsub.py --threads 16 update_pipeline_file_permissions -i file_of_directories.txt -t 4 -p 4 -g team81
+         bsub.py --threads 16 update_pipeline_file_permissions -i file_of_directories.txt -t 4 -p 4 -g team81
 
 USAGE
 }
