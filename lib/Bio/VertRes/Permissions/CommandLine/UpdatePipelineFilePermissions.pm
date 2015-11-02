@@ -1,6 +1,6 @@
 undef $VERSION;
 
-package Bio::VertRes::CommandLine::UpdatePipelineFilePermissions;
+package Bio::VertRes::Permissions::CommandLine::UpdatePipelineFilePermissions;
 
 # ABSTRACT: Update all the permissions of files in a list of directories
 
