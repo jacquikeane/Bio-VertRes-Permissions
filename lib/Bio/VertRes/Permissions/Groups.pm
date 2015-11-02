@@ -42,7 +42,7 @@ sub is_member_of_group {
         }
     }
 	$self->logger->info("The current users groups do not include $input_group");
-    return 0;
+    return undef;
 }
 
 no Moose;

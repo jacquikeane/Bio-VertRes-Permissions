@@ -18,4 +18,6 @@ is($groups->[0], $obj->is_member_of_group($groups->[0]),'Found group');
 my $groups_with_spaces = "some_group_with_doesnt_exist ".$groups->[0];
 is($groups->[0], $obj->is_member_of_group($groups_with_spaces),'Found group where its space separated');
 
+is(undef, $obj->is_member_of_group("some_group_with_doesnt_exist"),'group which doesnt exist should return undef');
+
 done_testing();
