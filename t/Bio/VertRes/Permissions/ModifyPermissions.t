@@ -34,7 +34,7 @@ for ( my $i = 0 ; $i < $num_temp_directories ; $i++ ) {
 	push(@temp_files, $temp_dir_obj->dirname. "/file_1");
 }
 
-my $octal_permissions = '0700';
+my $octal_permissions = 0700;
 for my $group ( @{$groups} ) {
 	next if $group =~ /^[\d]+$/;
     ok(

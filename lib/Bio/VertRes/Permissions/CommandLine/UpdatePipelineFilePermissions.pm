@@ -24,7 +24,7 @@ has 'type'                               => ( is => 'rw', isa => 'Str',      def
 has 'type_id'                            => ( is => 'rw', isa => 'Str',      default  => '' );
 has 'user'                               => ( is => 'rw', isa => 'Str',      default  => 'pathpipe' );
 has 'group'                              => ( is => 'rw', isa => 'Str',      default  => 'pathogen' );
-has 'octal_permissions'                  => ( is => 'rw', isa => 'Str',      default  => '0750' );
+has 'octal_permissions'                  => ( is => 'rw', isa => 'Num',      default  => 0750 );
 has 'partition_level'                    => ( is => 'rw', isa => 'Int',      default  => 2 );
 has 'threads_per_disk_array'             => ( is => 'rw', isa => 'Int',      default  => 1 );
 has 'num_disk_arrays_to_process_at_once' => ( is => 'rw', isa => 'Int',      default  => 1 );
@@ -63,7 +63,7 @@ sub BUILD {
     $self->type_id($type_id)                                                       if ( defined($type_id) );
     $self->user($user)                                                             if ( defined($user) );
     $self->group($group)                                                           if ( defined($group) );
-    $self->octal_permissions($octal_permissions)                                   if ( defined($octal_permissions) );
+    $self->octal_permissions(oct($octal_permissions))                                   if ( defined($octal_permissions) );
     $self->partition_level($partition_level)                                       if ( defined($partition_level) );
     $self->threads_per_disk_array($threads_per_disk_array)                         if ( defined($threads_per_disk_array) );
     $self->num_disk_arrays_to_process_at_once($num_disk_arrays_to_process_at_once) if ( defined($num_disk_arrays_to_process_at_once) );

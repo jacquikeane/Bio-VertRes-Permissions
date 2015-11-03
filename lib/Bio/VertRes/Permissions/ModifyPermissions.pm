@@ -7,7 +7,7 @@ package Bio::VertRes::Permissions::ModifyPermissions;
 Take in a list of directories and update the permissions and owners of all files
    use Bio::VertRes::Permissions::ModifyPermissions;
    
-   my $obj = Bio::VertRes::Permissions::ModifyPermissions->new(input_directories => \@directories, user => 'xyz', group => 'abc', octal_permissions => '750');
+   my $obj = Bio::VertRes::Permissions::ModifyPermissions->new(input_directories => \@directories, user => 'xyz', group => 'abc', octal_permissions => 0750);
    $obj->update_permissions;
 
 
@@ -26,7 +26,7 @@ has 'input_directories' => (
 has 'threads'           => ( is => 'ro', isa => 'Int', default  => 1 );
 has 'group'             => ( is => 'ro', isa => 'Str', required => 1 );
 has 'user'              => ( is => 'ro', isa => 'Str', lazy => 1, builder => '_build_user' );
-has 'octal_permissions' => ( is => 'ro', isa => 'Str', default  => '0750' );
+has 'octal_permissions' => ( is => 'ro', isa => 'Num', default  => 0750 );
 
 sub BUILD {
     my ($self) = @_;
@@ -50,7 +50,7 @@ sub _wanted {
     my $uid = getpwnam $self->user;
     my $gid = getgrnam $self->group;
 
-    chmod oct( $self->octal_permissions ), $File::Find::name;
+    chmod $self->octal_permissions, $File::Find::name;
     chown $uid, $gid, $_;
 }
 

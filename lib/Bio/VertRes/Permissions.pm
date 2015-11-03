@@ -7,7 +7,7 @@ package Bio::VertRes::Permissions;
 Modify the permissions of all files in an input set of directories
    use Bio::VertRes::Permissions;
    
-   my $obj = Bio::VertRes::Permissions->new(input_directories => \@directories, partition_level => 2, threads => 1, group => 'abc', user => 'efg', octal_permissions => '0700');
+   my $obj = Bio::VertRes::Permissions->new(input_directories => \@directories, partition_level => 2, threads => 1, group => 'abc', user => 'efg', octal_permissions => 0700);
    $obj->update_permissions();
 
 =cut
@@ -24,7 +24,7 @@ has 'threads_per_disk_array'             => ( is => 'ro', isa => 'Int',      def
 has 'num_disk_arrays_to_process_at_once' => ( is => 'ro', isa => 'Int',      default  => 1 );
 has 'group'                              => ( is => 'ro', isa => 'Str',      required => 0 );
 has 'user'                               => ( is => 'ro', isa => 'Str',      required => 0 );
-has 'octal_permissions'                  => ( is => 'ro', isa => 'Str',      default  => '0750' );
+has 'octal_permissions'                  => ( is => 'ro', isa => 'Num',      default  => 0750 );
 has '_partitioned_directories'           => ( is => 'ro', isa => 'ArrayRef', lazy => 1, builder => '_build__partitioned_directories' );
 
 sub _build__partitioned_directories {
