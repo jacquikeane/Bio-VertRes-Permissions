@@ -20,4 +20,8 @@ is($groups->[0], $obj->is_member_of_group($groups_with_spaces),'Found group wher
 
 is(undef, $obj->is_member_of_group("some_group_with_doesnt_exist"),'group which doesnt exist should return undef');
 
+is(undef, $obj->is_member_of_group(""),'group which is empty should return undef');
+is(undef, $obj->is_member_of_group(undef),'group which is undef should return undef');
+
+
 done_testing();
