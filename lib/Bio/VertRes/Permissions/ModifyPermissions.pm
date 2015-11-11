@@ -50,8 +50,7 @@ sub _wanted {
     my $uid = getpwnam $self->user;
     my $gid = getgrnam $self->group;
 
-    my $octal_permissions =  oct($self->octal_permissions) if $self->octal_permissions =~ /^0/;
-    chmod $octal_permissions, $File::Find::name;
+    chmod $self->octal_permissions, $File::Find::name;
     chown $uid, $gid, $_;
 }
 
