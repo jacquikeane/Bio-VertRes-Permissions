@@ -44,8 +44,8 @@ sub BUILD {
         'g|group=s'                            => \$group,
         'o|octal_permissions=s'                => \$octal_permissions,
         'l|partition_level=i'                  => \$partition_level,
-        't|threads_per_disk_array'             => \$threads_per_disk_array,
-        'p|num_disk_arrays_to_process_at_once' => \$num_disk_arrays_to_process_at_once,
+        'd|threads_per_disk_array=i'             => \$threads_per_disk_array,
+        'p|num_disk_arrays_to_process_at_once=i' => \$num_disk_arrays_to_process_at_once,
         'v|verbose'                            => \$verbose,
         'h|help'                               => \$help,
     );
@@ -108,7 +108,7 @@ Options: -t STR    type [file_of_directories]
          -g STR    unix group [pathogen]
          -o STR    file permissions in octal [0750]
          -l INT    directory level to split on [2]
-         -t INT    threads per disk array [1]
+         -d INT    threads per disk array [1]
          -p INT    num disk arrays to process in parallel [1]
          -v        verbose output to STDOUT
          -h        this help message
@@ -117,7 +117,7 @@ Example: Run with defaults
          update_pipeline_file_permissions -i file_of_directories.txt 
 
 Example: Update group to team81 in parallel
-         bsub.py --threads 16 update_pipeline_file_permissions -i file_of_directories.txt -t 4 -p 4 -g team81
+         bsub.py --threads 16 update_pipeline_file_permissions -i file_of_directories.txt -d 4 -p 4 -g team81
 
 USAGE
 }
