@@ -26,6 +26,10 @@ has 'input_directories' => (
 has 'threads'           => ( is => 'ro', isa => 'Int', default  => 1 );
 has 'group'             => ( is => 'ro', isa => 'Str', required => 1 );
 has 'user'              => ( is => 'ro', isa => 'Str', lazy => 1, builder => '_build_user' );
+
+has '_uid'              => ( is => 'ro', isa => 'Num', lazy => 1, builder => '_build__uid' );
+has '_gid'              => ( is => 'ro', isa => 'Num', lazy => 1, builder => '_build__gid' );
+
 has 'octal_permissions' => ( is => 'ro', isa => 'Num', default  => 0750 );
 
 sub BUILD {
@@ -34,6 +38,20 @@ sub BUILD {
     $self->logger->info( "Changing file permissions - permissions: " . $self->octal_permissions );
     $self->logger->info( "Changing file permissions - user: " . $self->user );
     $self->logger->info( "Changing file permissions - group: " . $self->group );
+}
+
+sub _build__uid
+{
+	my ($self) = @_;
+	my $uid = getpwnam $self->user;
+	return $uid;
+}
+
+sub _build__gid
+{
+	my ($self) = @_;
+	my $gid = getgrnam $self->group;
+	return $gid;
 }
 
 sub _build_user
@@ -46,12 +64,12 @@ sub _wanted {
     my $self = ${ $_[0] }{self};
     return unless ( defined $File::Find::name );
 
-    $self->logger->info( "Update File: " . $File::Find::name );
-    my $uid = getpwnam $self->user;
-    my $gid = getgrnam $self->group;
-
+    my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks)= stat($File::Find::name);
     chmod $self->octal_permissions, $File::Find::name;
-    chown $uid, $gid, $_;
+    if($gid != $self->gid )
+    {
+       chown $self->uid, $self->gid, $_;
+    }
 }
 
 sub update_permissions {
