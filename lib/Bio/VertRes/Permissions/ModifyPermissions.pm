@@ -66,9 +66,9 @@ sub _wanted {
 
     my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks)= stat($File::Find::name);
     chmod $self->octal_permissions, $File::Find::name;
-    if($gid != $self->gid )
+    if($gid != $self->_gid )
     {
-       chown $self->uid, $self->gid, $_;
+       chown $self->_uid, $self->_gid, $_;
     }
 }
 
