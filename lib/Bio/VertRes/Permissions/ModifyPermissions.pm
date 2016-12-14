@@ -63,9 +63,16 @@ sub _build_user
 sub _wanted {
     my $self = ${ $_[0] }{self};
     return unless ( defined $File::Find::name );
+    return if($File::Find::name =~ /lock$/ );
 
     my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size, $atime,$mtime,$ctime,$blksize,$blocks)= stat($File::Find::name);
-    chmod $self->octal_permissions, $File::Find::name;
+
+    my $shifted_permissions = 1023 & $mode;
+    if( $shifted_permissions != $self->octal_permissions)
+    {
+    	chmod $self->octal_permissions, $File::Find::name;
+    }
+
     if($gid != $self->_gid )
     {
        chown $self->_uid, $self->_gid, $_;
