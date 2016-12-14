@@ -117,7 +117,7 @@ Example: Run with defaults
          update_pipeline_file_permissions -i file_of_directories.txt 
 
 Example: Update group to team81 in parallel
-         bsub.py --threads 16 update_pipeline_file_permissions -i file_of_directories.txt -d 4 -p 4 -g team81
+         bsub.py --threads 16 5 log update_pipeline_file_permissions -i file_of_directories.txt -d 4 -p 4 -g team81
 
 USAGE
 }
